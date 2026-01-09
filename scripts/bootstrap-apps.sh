@@ -6,7 +6,6 @@ source "$(dirname "${0}")/lib/common.sh"
 export LOG_LEVEL="debug"
 export ROOT_DIR="$(git rev-parse --show-toplevel)"
 
-# Talos requires the nodes to be 'Ready=False' before applying resources
 function wait_for_nodes() {
     log debug "Waiting for nodes to be available"
 
@@ -128,8 +127,8 @@ function sync_helm_releases() {
 }
 
 function main() {
-    check_env KUBECONFIG TALOSCONFIG
-    check_cli helmfile kubectl kustomize sops talhelper yq
+    check_env KUBECONFIG
+    check_cli helmfile kubectl kustomize sops yq
 
     # Apply resources and Helm releases
     wait_for_nodes
