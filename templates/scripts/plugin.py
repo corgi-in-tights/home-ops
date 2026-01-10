@@ -111,6 +111,14 @@ def github_push_token(file_path: str = 'github-push-token.txt') -> str:
     except Exception as e:
         raise RuntimeError(f"Unexpected error while reading {file_path}: {e}")
 
+def vault_agent_token(file_path: str = '.agent.key') -> str:
+    try:
+        with open(file_path, 'r') as file:
+            return file.read().strip()
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File not found: {file_path}")
+    except Exception as e:
+        raise RuntimeError(f"Unexpected error while reading {file_path}: {e}")
 
 class Plugin(makejinja.plugin.Plugin):
     def __init__(self, data: dict[str, Any]):
@@ -129,6 +137,8 @@ class Plugin(makejinja.plugin.Plugin):
         data.setdefault('repository_branch', 'main')
         data.setdefault('repository_visibility', 'public')
         data.setdefault('cilium_loadbalancer_mode', 'dsr')
+        data.setdefault('ssh_user', 'debian')
+        data.setdefault('k3s_version', 'v1.35.0+k3s1')
 
         # If all BGP keys are set, enable BGP
         bgp_keys = ['cilium_bgp_router_addr', 'cilium_bgp_router_asn', 'cilium_bgp_node_asn']
@@ -156,4 +166,5 @@ class Plugin(makejinja.plugin.Plugin):
             cloudflare_tunnel_secret,
             github_deploy_key,
             github_push_token,
+            vault_agent_token,
         ]

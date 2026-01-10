@@ -5,23 +5,31 @@ set: [pipefail]
 shopt: [globstar]
 
 vars:
-  BOOTSTRAP_DIR: '{{.ROOT_DIR}}/bootstrap'
-  KUBERNETES_DIR: '{{.ROOT_DIR}}/kubernetes'
+  BUILD_DIR: '{{.ROOT_DIR}}/build'
+  BOOTSTRAP_DIR: '{{.BUILD_DIR}}/bootstrap'
+  KUBERNETES_DIR: '{{.BUILD_DIR}}/kubernetes'
+  ANSIBLE_DIR: '{{.BUILD_DIR}}/ansible'
   SCRIPTS_DIR: '{{.ROOT_DIR}}/scripts'
   PRIVATE_DIR: '{{.ROOT_DIR}}/.private'
-  TALOSCONFIG: '{{.ROOT_DIR}}/talos/clusterconfig/talosconfig'
 
 env:
   KUBECONFIG: '{{.ROOT_DIR}}/kubeconfig'
   SOPS_AGE_KEY_FILE: '{{.ROOT_DIR}}/age.key'
 
 includes:
+  ansible: .taskfiles/ansible
   bootstrap: .taskfiles/bootstrap
   template: .taskfiles/template
 
 tasks:
 
   default: task --list
+
+  ping:
+    desc: Ping the Kubernetes cluster to verify connectivity
+    cmd: kubectl --kubeconfig {{.KUBECONFIG}} get nodes
+    preconditions:
+      - test -f {{.KUBECONFIG}}
 
   reconcile:
     desc: Force Flux to pull in changes from your Git repository

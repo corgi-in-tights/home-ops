@@ -17,6 +17,8 @@ tasks:
       - task: generate-age-key
       - task: generate-deploy-key
       - task: generate-push-token
+      - task: generate-ansible-vault-password
+      - task: generate-agent-token
 
   generate-template-config:
     internal: true
@@ -48,6 +50,27 @@ tasks:
     cmd: python -c "import secrets; print(secrets.token_hex(16))" > {{.ROOT_DIR}}/github-push-token.txt
     status:
       - test -f {{.ROOT_DIR}}/github-push-token.txt
+
+  generate-ansible-vault-password:
+    internal: true
+    desc: "Generate a secure random Ansible Vault password"
+    cmds:
+      - python3 -c "import secrets; print(secrets.token_hex(32))" > {{.ROOT_DIR}}/.vault.key
+    status:
+      - test -f {{.ROOT_DIR}}/.vault.key
+
+  generate-agent-token:
+    desc: "Generate a K3s token and encrypt it with Ansible Vault"
+    deps: [ generate-ansible-vault-password ]
+    cmds:
+      - |
+        TOKEN=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+        # Use ansible-vault to turn the raw token into an encrypted YAML block
+        VAULTED_TOKEN=$(ansible-vault encrypt_string "$TOKEN" --vault-password-file .vault.key)
+        # Save it to a file that makejinja will read
+        echo "$VAULTED_TOKEN" > .agent.key
+    status:
+      - test -f .agent.key
 
   :configure:
     desc: Render and validate configuration files

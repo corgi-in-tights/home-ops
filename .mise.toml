@@ -2,7 +2,6 @@
 _.python.venv = { path = "{{config_root}}/.venv", create = true }
 KUBECONFIG = "{{config_root}}/kubeconfig"
 SOPS_AGE_KEY_FILE = "{{config_root}}/age.key"
-TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
 
 [tools]
 "python" = "3.14.2"
@@ -22,5 +21,5 @@ TALOSCONFIG = "{{config_root}}/talos/clusterconfig/talosconfig"
 "aqua:kubernetes-sigs/kustomize" = "5.7.1"
 "aqua:kubernetes/kubernetes/kubectl" = "1.35.0"
 "aqua:mikefarah/yq" = "4.50.1"
-"aqua:siderolabs/talos" = "1.12.1"
 "aqua:yannh/kubeconform" = "0.7.0"
+ansible = "latest"

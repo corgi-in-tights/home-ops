@@ -26,6 +26,8 @@ import (
 	cilium_bgp_router_asn?: string & !=""
 	cilium_bgp_node_asn?: string & !=""
 	cilium_loadbalancer_mode?: *"dsr" | "snat"
+	ssh_user?: string
+	k3s_version?: string
 }
 
 #Config
