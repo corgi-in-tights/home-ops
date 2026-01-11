@@ -12,8 +12,7 @@ spec:
     autoDirectNodeRoutes: true
     bpf:
       masquerade: true
-      # Ref: https://github.com/siderolabs/talos/issues/10002
-      hostLegacyRouting: true
+      hostLegacyRouting: false
     #% if cilium_bgp_enabled %#
     bgpControlPlane:
       enabled: true
@@ -26,8 +25,7 @@ spec:
         enabled: false
       hostRoot: /sys/fs/cgroup
     # NOTE: devices might need to be set if you have more than one active NIC on your hosts
-    devices:
-      - ens18
+    devices: ens18
     dashboards:
       enabled: true
     endpointRoutes:
@@ -93,3 +91,5 @@ spec:
     socketLB:
       enabled: true
       hostNamespaceOnly: true
+    externalIPs:
+      enabled: true
