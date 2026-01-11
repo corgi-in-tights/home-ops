@@ -5,10 +5,9 @@ set: [pipefail]
 shopt: [globstar]
 
 vars:
-  BUILD_DIR: '{{.ROOT_DIR}}/build'
-  BOOTSTRAP_DIR: '{{.BUILD_DIR}}/bootstrap'
-  KUBERNETES_DIR: '{{.BUILD_DIR}}/kubernetes'
-  ANSIBLE_DIR: '{{.BUILD_DIR}}/ansible'
+  BOOTSTRAP_DIR: '{{.ROOT_DIR}}/bootstrap'
+  KUBERNETES_DIR: '{{.ROOT_DIR}}/kubernetes'
+  ANSIBLE_DIR: '{{.ROOT_DIR}}/ansible'
   SCRIPTS_DIR: '{{.ROOT_DIR}}/scripts'
   PRIVATE_DIR: '{{.ROOT_DIR}}/.private'
 

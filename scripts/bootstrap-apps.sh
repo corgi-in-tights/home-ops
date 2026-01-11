@@ -5,7 +5,7 @@ source "$(dirname "${0}")/lib/common.sh"
 
 export LOG_LEVEL="debug"
 export ROOT_DIR="$(git rev-parse --show-toplevel)"
-export BUILD_DIR="${ROOT_DIR}/build"
+export BUILD_DIR="${ROOT_DIR}"
 
 function wait_for_nodes() {
     log debug "Waiting for nodes to be available"
