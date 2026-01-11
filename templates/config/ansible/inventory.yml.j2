@@ -39,13 +39,20 @@ k3s_cluster:
     # extra_manifests: [ '/path/to/manifest1.yaml', '/path/to/manifest2.yaml' ]
     # airgap_dir: /tmp/k3s-airgap-images
 
-    #   This is now an inner yaml file. Maintain the indentation.
+    #   These are inner yaml files. Maintain the indentation.
     #   YAML here will be placed as the content of /etc/rancher/k3s/config.yaml
     #   See https://docs.k3s.io/installation/configuration#configuration-file
+
+    registries_yaml: |
+      mirrors:
+        docker.io:
+        registry.k8s.io:
+
     # flannel-backend: "none"
     # disable-network-policy: true
     # disable-kube-proxy: true
     server_config_yaml:  |
+      embedded-registry: true
       node-taint:
         - "k3s-controlplane=true:NoExecute"
       protect-kernel-defaults: true

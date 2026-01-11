@@ -57,6 +57,22 @@
         mode: "0644"
       register: _agent_config_result
 
+- name: Setup optional registries file
+  when: registries_yaml is defined
+  block:
+    - name: Make config directory
+      ansible.builtin.file:
+        path: "/etc/rancher/k3s"
+        mode: "0755"
+        state: directory
+    - name: Copy config values
+      # noqa var-naming[no-role-prefix]
+      ansible.builtin.copy:
+        content: "{{ registries_yaml }}"
+        dest: "/etc/rancher/k3s/registries.yaml"
+        mode: "0644"
+      register: _registries_file_result
+
 - name: Get the token from the first server
   # noqa var-naming[no-role-prefix]
   ansible.builtin.set_fact:

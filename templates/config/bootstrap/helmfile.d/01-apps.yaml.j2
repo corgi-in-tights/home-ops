@@ -12,22 +12,6 @@ releases:
     version: 1.18.5
     values: ['./templates/values.yaml.gotmpl']
 
-  - name: coredns
-    namespace: kube-system
-    chart: oci://ghcr.io/coredns/charts/coredns
-    version: 1.45.0
-    values: ['./templates/values.yaml.gotmpl']
-    needs: ['kube-system/cilium']
-
-  #% if spegel_enabled %#
-  - name: spegel
-    namespace: kube-system
-    chart: oci://ghcr.io/spegel-org/helm-charts/spegel
-    version: 0.6.0
-    values: ['./templates/values.yaml.gotmpl']
-    needs: ['kube-system/coredns']
-  #% endif %#
-
   - name: cert-manager
     namespace: cert-manager
     chart: oci://quay.io/jetstack/charts/cert-manager
