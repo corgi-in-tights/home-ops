@@ -26,7 +26,8 @@ spec:
         enabled: false
       hostRoot: /sys/fs/cgroup
     # NOTE: devices might need to be set if you have more than one active NIC on your hosts
-    # devices: eno+ eth+
+    devices:
+      - ens18
     dashboards:
       enabled: true
     endpointRoutes:
@@ -46,6 +47,9 @@ spec:
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
     l2announcements:
       enabled: true
+      leaseDuration: 120s
+      leaseRenewDeadline: 60s
+      leaseRetryPeriod: 1s
     loadBalancer:
       algorithm: maglev
       mode: "#{ cilium_loadbalancer_mode }#"
