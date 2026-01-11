@@ -3,66 +3,27 @@ set -Eeuo pipefail
 
 # Log messages with different levels
 function log() {
-    local level="${1:-info}"
-    shift
+    local level="$1" msg="$2"
+    shift 2 || true
 
-    # Define log levels with their priorities
-    local -A level_priority=(
-        [debug]=1
-        [info]=2
-        [warn]=3
-        [error]=4
-    )
+    local color reset="\033[0m"
+    case "${level}" in
+        debug) color="\033[34m" ;;
+        info)  color="\033[36m" ;;
+        warn)  color="\033[33m" ;;
+        error) color="\033[31m" ;;
+        *)     color="\033[0m"  ;;
+    esac
 
-    # Get the current log level's priority
-    local current_priority=${level_priority[$level]:-2} # Default to "info" priority
+    local upper
+    upper=$(echo "${level}" | tr '[:lower:]' '[:upper:]')
 
-    # Get the configured log level from the environment, default to "info"
-    local configured_level=${LOG_LEVEL:-info}
-    local configured_priority=${level_priority[$configured_level]:-2}
+    local extra=""
+    for arg in "$@"; do extra+=" ${arg}"; done
 
-    # Skip log messages below the configured log level
-    if ((current_priority < configured_priority)); then
-        return
-    fi
+    echo -e "${color}[${upper}]${reset} ${msg}${extra}" >&2
 
-    # Define log colors
-    local -A colors=(
-        [debug]="\033[1m\033[38;5;63m"  # Blue
-        [info]="\033[1m\033[38;5;87m"   # Cyan
-        [warn]="\033[1m\033[38;5;192m"  # Yellow
-        [error]="\033[1m\033[38;5;198m" # Red
-    )
-
-    # Fallback to "info" if the color for the given level is not defined
-    local color="${colors[$level]:-${colors[info]}}"
-    local msg="$1"
-    shift
-
-    # Prepare additional data
-    local data=
-    if [[ $# -gt 0 ]]; then
-        for item in "$@"; do
-            if [[ "${item}" == *=* ]]; then
-                data+="\033[1m\033[38;5;236m${item%%=*}=\033[0m\"${item#*=}\" "
-            else
-                data+="${item} "
-            fi
-        done
-    fi
-
-    # Determine output stream based on log level
-    local output_stream="/dev/stdout"
-    if [[ "$level" == "error" ]]; then
-        output_stream="/dev/stderr"
-    fi
-
-    # Print the log message
-    printf "%s %b%s%b %s %b\n" "$(date -u +"%Y-%m-%dT%H:%M:%SZ")" \
-        "${color}" "${level^^}" "\033[0m" "${msg}" "${data}" >"${output_stream}"
-
-    # Exit if the log level is error
-    if [[ "$level" == "error" ]]; then
+    if [[ "${level}" == "error" ]]; then
         exit 1
     fi
 }

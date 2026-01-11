@@ -72,9 +72,9 @@ tasks:
     status:
       - test -f .agent.key
 
-  :configure:
+  :render:
     desc: Render and validate configuration files
-    prompt: Any conflicting files in the kubernetes directory will be overwritten... continue?
+    prompt: Any conflicting files in the build directory will be overwritten... continue?
     cmds:
       - task: validate-schemas
       - task: render-configs

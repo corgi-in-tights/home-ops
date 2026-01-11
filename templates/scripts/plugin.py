@@ -3,6 +3,7 @@ from typing import Any
 
 import base64
 import ipaddress
+import os
 import makejinja
 import re
 import json
@@ -23,6 +24,11 @@ def nthhost(value: str, query: int) -> str | bool:
         pass
     return False
 
+# Return the value of an environment variable
+def env(key: str) -> Any:
+    if key not in os.environ:
+        raise KeyError(f"Environment variable '{key}' not found.")
+    return os.getenv(key)
 
 # Return the age public or private key from age.key
 def age_key(key_type: str, file_path: str = 'age.key') -> str:
@@ -161,6 +167,7 @@ class Plugin(makejinja.plugin.Plugin):
 
     def functions(self) -> makejinja.plugin.Functions:
         return [
+            env,
             age_key,
             cloudflare_tunnel_id,
             cloudflare_tunnel_secret,
