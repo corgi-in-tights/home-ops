@@ -18,8 +18,7 @@ spec:
       enabled: true
     #% endif %#
     cni:
-      # Required for pairing with Multus CNI
-      exclusive: false
+      exclusive: true
     cgroup:
       automount:
         enabled: false

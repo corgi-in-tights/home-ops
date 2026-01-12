@@ -14,8 +14,7 @@ spec:
       masquerade: true
       hostLegacyRouting: false
     cni:
-      # Required for pairing with Multus CNI
-      exclusive: false
+      exclusive: true
     cgroup:
       automount:
         enabled: false
