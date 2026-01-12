@@ -12,8 +12,7 @@ spec:
     autoDirectNodeRoutes: true
     bpf:
       masquerade: true
-      # Ref: https://github.com/siderolabs/talos/issues/10002
-      hostLegacyRouting: true
+      hostLegacyRouting: false
     cni:
       # Required for pairing with Multus CNI
       exclusive: false
@@ -22,17 +21,21 @@ spec:
         enabled: false
       hostRoot: /sys/fs/cgroup
     # NOTE: devices might need to be set if you have more than one active NIC on your hosts
-    # devices: eno+ eth+
+    devices: ens18
     dashboards:
       enabled: true
     endpointRoutes:
       enabled: true
     envoy:
-      enabled: false
+      enabled: true
     gatewayAPI:
-      enabled: false
+      enabled: true
     hubble:
-      enabled: false
+      enabled: true
+      relay:
+        enabled: true
+      ui:
+        enabled: true
     ipam:
       mode: kubernetes
     ipv4NativeRoutingCIDR: "10.42.0.0/16"
@@ -42,9 +45,12 @@ spec:
     kubeProxyReplacementHealthzBindAddr: 0.0.0.0:10256
     l2announcements:
       enabled: true
+      leaseDuration: 120s
+      leaseRenewDeadline: 60s
+      leaseRetryPeriod: 1s
     loadBalancer:
       algorithm: maglev
-      mode: "dsr"
+      mode: "snat"
     localRedirectPolicy: true
     operator:
       dashboards:
@@ -85,3 +91,5 @@ spec:
     socketLB:
       enabled: true
       hostNamespaceOnly: true
+    externalIPs:
+      enabled: true
