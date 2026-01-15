@@ -1,0 +1,10 @@
+---
+- name: Bootstrap apps on the cluster
+  hosts: localhost
+  connection: local
+  gather_facts: false
+  roles:
+    - role: bootstrap
+  vars:
+    kubeconfig: /Users/reyaan/Projects/home-ops/kubeconfig
+    kubernetes_dir: "{{ playbook_dir }}/../../kubernetes"
