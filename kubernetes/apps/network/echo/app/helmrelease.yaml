@@ -1,4 +1,5 @@
 ---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -16,7 +17,7 @@ spec:
           app:
             image:
               repository: ghcr.io/mendhak/http-https-echo
-              tag: 38
+              tag: 39
             env:
               HTTP_PORT: &port 80
               LOG_WITHOUT_NEWLINE: true
@@ -38,7 +39,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: ["ALL"] }
+              capabilities: {drop: ["ALL"]}
             resources:
               requests:
                 cpu: 10m
@@ -47,8 +48,8 @@ spec:
     defaultPodOptions:
       securityContext:
         runAsNonRoot: true
-        runAsUser: 65534
-        runAsGroup: 65534
+        runAsUser: 1000
+        runAsGroup: 1000
     service:
       app:
         ports:
@@ -60,12 +61,8 @@ spec:
           - port: http
     route:
       app:
-        hostnames: ["{{ .Release.Name }}.reyaan.dev"]
+        hostnames:
+          - "{{ .Release.Name }}.reyaan.dev"
         parentRefs:
           - name: envoy-external
             namespace: network
-            sectionName: https
-        rules:
-          - backendRefs:
-              - identifier: app
-                port: *port

@@ -1,4 +1,9 @@
-# ⛵ Cluster Template
+# Home Ops
+
+yes ansible bootstrapping is incomplete right now please dont bully me about it, not planning on adding any new nodes anytime soon
+
+
+
 
 Welcome to my template designed for deploying a single Kubernetes cluster. Whether you're setting up a cluster at home on bare-metal or virtual machines (VMs), this project aims to simplify the process and make Kubernetes more accessible. This template is inspired by my personal [home-ops](https://github.com/onedr0p/home-ops) repository, providing a practical starting point for anyone interested in managing their own Kubernetes environment.
 
