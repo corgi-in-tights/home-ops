@@ -1,0 +1,10 @@
+---
+k3s_cluster:
+  children:
+    server:
+      hosts:
+        192.168.68.21:
+    agent:
+      hosts:
+        192.168.68.22:
+        192.168.68.23:

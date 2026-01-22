@@ -1,0 +1,11 @@
+---
+- name: Install and configure Tailscale
+  collections:
+  - artis3n.tailscale
+  block:
+    - name: Install and configure Tailscale on target node
+      include_role:
+        name: machine
+      vars:
+        tailscale_authkey: "{{ hostvars['SESSION_DATA'].tailscale_auth_key }}"
+        tailscale_args: "--ssh"

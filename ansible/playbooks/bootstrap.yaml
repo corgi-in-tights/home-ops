@@ -1,15 +1,45 @@
 ---
+- name: Setup 1Password Vault access and ephemeral SESSION_DATA host
+  hosts: localhost
+  gather_facts: false
+  roles:
+    - role: op_vault
+
 - name: Setup Tailscale on nodes
   hosts: k3s_cluster
   become: true
+  gather_facts: true
   roles:
-    - role: artis3n.tailscale.machine
-      vars:
-        tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
-        tailscale_args: "--ssh"
+    - role: tailscale
+  vars:
+    tailscale_auth_key: "{{ hostvars['SESSION_DATA']['tailscale_auth_key'] }}"
 
-- name: Install K3S cluster
-  ansible.builtin.import_playbook: k3s-ansible/playbooks/site.yml
+- name: Cluster prep
+  hosts: k3s_cluster
+  gather_facts: true
+  become: true
+  collections:
+    - k3s.orchestration
+  roles:
+    - role: prereq
+    - role: airgap
+    - role: raspberrypi
+
+- name: Setup K3S server
+  hosts: server
+  become: true
+  collections:
+    - k3s.orchestration
+  roles:
+    - role: k3s_server
+
+- name: Setup K3S agent
+  hosts: agent
+  collections:
+    - k3s.orchestration
+  become: true
+  roles:
+    - role: k3s_agent
 
 - name: Bootstrap apps on the cluster
   hosts: localhost
@@ -18,5 +48,14 @@
   roles:
     - role: bootstrap
   vars:
-    kubeconfig: "{{ kubeconfig }}"
-    kubernetes_dir: "{{ playbook_dir }}/../../kubernetes"
+    kubeconfig: "{{ lookup('env', 'KUBECONFIG') }}"
+    kubernetes_dir: "{{ lookup('env', 'KUBERNETES_DIR') }}"
+
+- name: Cleanup Session Variables
+  hosts: ephemeral
+  gather_facts: false
+  tasks:
+    - name: Overwrite sensitive data in the volatile container
+      add_host:
+        tailscale_auth_key: "REDACTED"
+  no_log: true

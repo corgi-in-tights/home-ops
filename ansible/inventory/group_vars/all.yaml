@@ -1,0 +1,5 @@
+k3s_version: "v1.35.0+k3s1"
+kubeconfig: "{{ env('KUBECONFIG') }}"
+
+op__bootstrap_vault: "kubernetes"
+op__bootstrap_item: "bootstrap"

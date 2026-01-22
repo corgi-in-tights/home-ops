@@ -1,23 +1,4 @@
 ---
-- name: Ensure required variables are set
-  assert:
-    that:
-      - kubeconfig is defined
-    fail_msg: "Required variable 'kubeconfig' is not defined!"
-
-- name: Verify 1Password CLI session
-  block:
-  - name: Check 1Password CLI session
-    ansible.builtin.command: op whoami
-    register: op_check
-    ignore_errors: true
-    changed_when: false
-
-  - name: Fail if not authenticated
-    ansible.builtin.fail:
-      msg: 1Password session has expired or is not active. Use `eval $(op signin)` to sign in.
-    when: op_check.rc != 0
-
 - name: Ensure required CLI tools are installed
   assert:
     that:

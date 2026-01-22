@@ -1,0 +1,29 @@
+---
+- name: Verify 1Password authentication
+  block:
+    - name: Check 1Password status
+      command: op account get
+      register: op_check
+      failed_when: op_check.rc != 0
+      changed_when: false
+
+    - name: Ensure 1Password is authenticated
+      assert:
+        that: "op_check.rc == 0"
+        fail_msg: "You are not signed into 1Password. Please run 'op signin'."
+        quiet: true
+
+- name: Initialize Session Variables
+  block:
+    - name: Fetch Tailscale Auth Key from 1Password
+      # Example: op read "op://vault/item/section/label"
+      command: "op read 'op://{{ op__bootstrap_vault }}/{{ op__bootstrap_item }}/TAILSCALE_AUTH_KEY'"
+      register: op__tailscale_result
+      changed_when: false
+      no_log: true
+
+    - name: Create a volatile data container
+      add_host:
+        name: "SESSION_DATA"
+        groups: "ephemeral"
+        tailscale_auth_key: "{{ op__tailscale_result.stdout }}"
