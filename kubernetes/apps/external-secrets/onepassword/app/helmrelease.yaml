@@ -29,7 +29,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: "{{ .Release.Name }}-secret"
-                    key: 1password-credentials.json
+                    key: credentials_json
             probes:
               liveness:
                 enabled: true
@@ -75,7 +75,7 @@ spec:
                 valueFrom:
                   secretKeyRef:
                     name: "{{ .Release.Name }}-secret"
-                    key: 1password-credentials.json
+                    key: credentials_json
             probes:
               liveness:
                 enabled: true

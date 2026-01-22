@@ -1,4 +1,16 @@
 ---
+- name: Setup Tailscale on nodes
+  hosts: k3s_cluster
+  become: true
+  roles:
+    - role: artis3n.tailscale.machine
+      vars:
+        tailscale_authkey: "{{ lookup('env', 'TAILSCALE_KEY') }}"
+        tailscale_args: "--ssh"
+
+- name: Install K3S cluster
+  ansible.builtin.import_playbook: k3s-ansible/playbooks/site.yml
+
 - name: Bootstrap apps on the cluster
   hosts: localhost
   connection: local
@@ -6,5 +18,5 @@
   roles:
     - role: bootstrap
   vars:
-    kubeconfig: /Users/reyaan/Projects/home-ops/kubeconfig
+    kubeconfig: "{{ kubeconfig }}"
     kubernetes_dir: "{{ playbook_dir }}/../../kubernetes"

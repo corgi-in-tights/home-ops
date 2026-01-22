@@ -1,0 +1,92 @@
+---
+- name: Ensure required variables are set
+  assert:
+    that:
+      - kubeconfig is defined
+    fail_msg: "Required variable 'kubeconfig' is not defined!"
+
+- name: Verify 1Password CLI session
+  block:
+  - name: Check 1Password CLI session
+    ansible.builtin.command: op whoami
+    register: op_check
+    ignore_errors: true
+    changed_when: false
+
+  - name: Fail if not authenticated
+    ansible.builtin.fail:
+      msg: 1Password session has expired or is not active. Use `eval $(op signin)` to sign in.
+    when: op_check.rc != 0
+
+- name: Ensure required CLI tools are installed
+  assert:
+    that:
+      - lookup('pipe', 'command -v ' ~ item ~ ' >/dev/null 2>&1 || echo missing') != 'missing'
+    fail_msg: "Required CLI '{{ item }}' is not installed"
+  loop:
+    - helmfile
+    - kubectl
+    - kustomize
+    - yq
+
+- name: Check if Kubernetes cluster is accessible
+  block:
+    - name: Get cluster info
+      ansible.builtin.command: kubectl --kubeconfig "{{ kubeconfig }}" cluster-info
+      register: cluster_info
+      changed_when: false
+      failed_when: cluster_info.rc != 0
+
+- name: Apply Kubernetes namespaces for apps
+  block:
+    - name: Find app directories
+      ansible.builtin.find:
+        paths: "{{ kubernetes_dir }}/apps"
+        file_type: directory
+        recurse: false
+      register: app_directories
+
+    - name: Build then apply namespaces from app directories
+      ansible.builtin.shell: |
+        set -o pipefail
+        kustomize build "{{ item.path }}" | \
+        yq ea -e 'select(.kind == "Namespace")' | \
+        kubectl apply --kubeconfig "{{ kubeconfig }}" --server-side --field-manager bootstrap --force-conflicts -f -
+      args:
+        executable: /bin/bash
+      loop: "{{ app_directories.files }}"
+      loop_control:
+        label: "{{ item.path | basename }}"
+      register: apply_result
+      changed_when: "'serverside-applied' in apply_result.stdout or 'created' in apply_result.stdout"
+
+- name: Apply Kubernetes resources
+  ansible.builtin.shell: |
+    minijinja-cli "{{ role_path }}/templates/resources.yaml.j2" | \
+    op inject | \
+    kubectl apply --kubeconfig "{{ kubeconfig }}" \
+      --server-side \
+      --field-manager bootstrap \
+      --force-conflicts \
+      -f -
+  register: apply_result
+  changed_when: "'serverside-applied' in apply_result.stdout or 'created' in apply_result.stdout"
+
+- name: Deploy Helmfile Resources
+  block:
+    - name: Apply Helmfile CRDs
+      ansible.builtin.shell: |
+        set -o pipefail
+        helmfile --kubeconfig "{{ kubeconfig }}" -f "{{ role_path }}/templates/00-crds.yaml" template -q | \
+        yq ea -e 'select(.kind == "CustomResourceDefinition")' | \
+        kubectl apply --kubeconfig "{{ kubeconfig }}" --server-side --field-manager bootstrap --force-conflicts -f -
+      args:
+        executable: /bin/bash
+      register: crd_apply
+      changed_when: "'serverside-applied' in crd_apply.stdout or 'created' in crd_apply.stdout"
+
+    - name: Sync Helmfile apps
+      ansible.builtin.shell: |
+        helmfile --kubeconfig "{{ kubeconfig }}" -f "{{ role_path }}/templates/01-apps.yaml" sync --hide-notes
+      register: helmfile_sync
+      changed_when: "'uninstalled' in helmfile_sync.stdout or 'installed' in helmfile_sync.stdout or 'upgraded' in helmfile_sync.stdout"
