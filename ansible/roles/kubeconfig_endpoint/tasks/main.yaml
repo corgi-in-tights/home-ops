@@ -1,0 +1,26 @@
+---
+- name: Load existing kubeconfig
+  set_fact:
+    kubeconfig_data: "{{ lookup('file', kubeconfig) | from_yaml }}"
+
+- name: Update kubeconfig server endpoint
+  set_fact:
+    kubeconfig_data: >-
+      {{
+        kubeconfig_data | combine({
+          'clusters': [
+            {
+              'name': kubeconfig_data.clusters[0].name,
+              'cluster': kubeconfig_data.clusters[0].cluster | combine({
+                'server': 'https://' + tailscale_api_endpoint + ':6443'
+              })
+            }
+          ]
+        })
+      }}
+
+- name: Write updated kubeconfig back to file
+  copy:
+    content: "{{ kubeconfig_data | to_nice_yaml }}"
+    dest: "{{ kubeconfig }}"
+    mode: '0600'
