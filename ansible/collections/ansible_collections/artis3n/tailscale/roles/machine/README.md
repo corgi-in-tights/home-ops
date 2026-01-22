@@ -57,9 +57,6 @@ A Tailscale Node Authorization auth key.
 
 A Node Authorization key can be generated under your Tailscale account. The role supports two type of keys:
 
-- Auth key (`tskey-auth-XXX-YYYYY`) <https://login.tailscale.com/admin/authkeys>
-- OAuth key (`tskey-client-XXX-YYYY`) <https://login.tailscale.com/admin/settings/oauth>
-
 > [!IMPORTANT]
 > Entering an OAuth key additionally leverages the following role variables:
 >
