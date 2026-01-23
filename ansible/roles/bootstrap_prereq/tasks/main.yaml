@@ -1,0 +1,5 @@
+---
+- name: Download iscsid package
+  apt:
+    name: open-iscsi
+    state: present

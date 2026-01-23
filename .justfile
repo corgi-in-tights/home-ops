@@ -6,10 +6,10 @@ set shell := ['bash', '-euo', 'pipefail', '-c']
 mod kube "kubernetes"
 mod ans "ansible"
 
-export KUBECONFIG := "$(pwd)/kubeconfig"
+export KUBECONFIG := justfile_dir() + "/kubeconfig"
 
-ansible_dir := '$(pwd)/ansible'
-kubernetes_dir := '$(pwd)/kubernetes'
+ansible_dir := justfile_dir() + '/ansible'
+kubernetes_dir := justfile_dir() + '/kubernetes'
 
 [private]
 default:

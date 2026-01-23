@@ -11,8 +11,10 @@ spec:
   interval: 1h
   values:
     ingress:
-          enabled: false
+      enabled: false
     defaultSettings:
-        defaultDataLocality: "best-effort"
+      defaultDataLocality: "best-effort"
     persistence:
       defaultClassReplicaCount: 1
+    longhornUI:
+        replicas: 1

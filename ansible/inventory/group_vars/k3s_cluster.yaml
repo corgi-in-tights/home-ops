@@ -1,6 +1,7 @@
 ansible_port: 22
 ansible_user: "sysrc"
 api_endpoint: "{{ hostvars[groups['server'][0]]['ansible_host'] | default(groups['server'][0]) }}"
+control_node_endpoint: "https://k3s.reyaan.dev:6443"
 
 # Optional vars
 # extra_server_args: ""
